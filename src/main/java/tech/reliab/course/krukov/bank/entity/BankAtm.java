@@ -1,15 +1,30 @@
 package tech.reliab.course.krukov.bank.entity;
 
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import tech.reliab.course.krukov.bank.enums.BankStatus;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+@Entity
 public class BankAtm {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Setter(AccessLevel.NONE)
     private int id;
     private String name;
     private String address;
     private BankStatus status;
+    @ManyToOne
     private Bank bank;
+    @Column(length = 500)
     private String location;
+    @ManyToOne
     private Employee employee;
+    @ManyToOne
+    private BankOffice bankOffice;
     private boolean isWithdrawAvaiable;
     private boolean isDepositAvaiable;
     private double balance;
@@ -17,7 +32,6 @@ public class BankAtm {
 
     /**
      * Конструктор класса BankAtm
-     * @param id ID банкомата
      * @param name Имя банкомата
      * @param address Адрес банка
      * @param bank Банк, которому принадлежит банкомат
@@ -27,8 +41,7 @@ public class BankAtm {
      * @param canDeposit Можно ли внести деньги
      * @param maintenanceCost Стоимость обслуживания банкомата
      */
-    public BankAtm(int id, String name, String address, Bank bank, String location, Employee employee, boolean canWithdraw, boolean canDeposit, double maintenanceCost) {
-        this.id = id;
+    public BankAtm(String name, String address, Bank bank, String location, Employee employee, boolean canWithdraw, boolean canDeposit, double maintenanceCost) {
         this.name = name;
         this.address = address;
         this.status = BankStatus.WORKING;
@@ -41,16 +54,8 @@ public class BankAtm {
         this.maintenanceCost = maintenanceCost;
     }
 
-    /**
-     * Получение Id.
-     * @return Идентификатор
-     */
-    public int getId() { return this.id; }
+    public BankAtm() { }
 
-    /**
-     * Переопределение метода toString() для банкомата.
-     * @return Информация об обьекте
-     */
     @Override
     public String toString() {
         return "Информация о банкомате " + this.name + ":\n" +

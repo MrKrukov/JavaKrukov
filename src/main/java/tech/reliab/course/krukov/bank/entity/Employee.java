@@ -1,28 +1,38 @@
 package tech.reliab.course.krukov.bank.entity;
 
 import java.time.LocalDate;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+@Entity
 public class Employee extends Person {
     private String job;
     private String position;
+    @ManyToOne
     private Bank bank;
     private boolean worksInOffice;
+    @ManyToOne
     private BankOffice bankOffice;
     private boolean canIssueLoans;
     private double salary;
 
-    public Employee(int id, String name, LocalDate birthDate, String job, Bank bank,
-                    String position, boolean worksInOffice, BankOffice bankOffice,
+    public Employee(String name, LocalDate birthDate, String job, Bank bank,
+                     boolean worksInOffice, BankOffice bankOffice,
                     boolean canIssueLoans, double salary) {
-        super(id, name, birthDate);
+        super(name, birthDate);
         this.job = job;
-        this.position = position;
         this.bank = bank;
         this.worksInOffice = worksInOffice;
         this.bankOffice = bankOffice;
         this.canIssueLoans = canIssueLoans;
         this.salary = salary;
     }
+
+    public Employee() { }
 
     /**
      * Переопределение метода toString() для сотрудника.
