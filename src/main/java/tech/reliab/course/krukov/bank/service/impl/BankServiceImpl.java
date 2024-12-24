@@ -1,40 +1,31 @@
 package tech.reliab.course.krukov.bank.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import tech.reliab.course.krukov.bank.entity.Bank;
+import tech.reliab.course.krukov.bank.repository.BankRepository;
 import tech.reliab.course.krukov.bank.service.BankService;
+import java.util.List;
+import java.util.NoSuchElementException;
 
+@Service
 public class BankServiceImpl implements BankService {
-    private Bank bank;
+    @Autowired
+    private BankRepository bankRepository;
 
-    /**
-     * Создание нового банка.
-     */
     @Override
-    public void create(Bank newBank) {
-        this.bank = newBank;
+    public void registerBank(Bank bank) {
+        bankRepository.save(bank);
     }
 
     /**
      * Чтение данных банка.
+     *
      * @param id Идентификатор банка
      */
     @Override
-    public Bank read(int id) {
-        if (this.bank != null && this.bank.getId() == id) {
-            return bank;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Обновление данных банка.
-     */
-    @Override
-    public void update(Bank newBank) {
-        if (this.bank != null && this.bank.getId() == newBank.getId()) {
-            this.bank = newBank;
-        }
+    public Bank getBankById(long id) {
+        return bankRepository.findById(id).orElse(null);
     }
 
     /**
@@ -42,30 +33,110 @@ public class BankServiceImpl implements BankService {
      * @param id Идентификатор банка
      */
     @Override
-    public void delete(int id) {
-        if (this.bank != null && this.bank.getId() == id) {
-            this.bank = null;
-        }
+    public void deleteBank(long id) {
+        bankRepository.deleteById(id);
     }
 
     /**
      * Добавление офиса.
      */
-    public void addOffice() {
-        this.bank.officesCount++;
+    public int addOffice(int id) {
+        var bank = getBankIfExists(id);
+        bank.setOfficesCount(bank.getOfficesCount() + 1);
+
+        return bank.getOfficesCount();
     }
 
     /**
      * Добавление банкомата.
      */
-    public void addAtm() {
-        this.bank.atmsCount++;
+    public int addAtm(int id) {
+        var bank = getBankIfExists(id);
+        bank.setAtmsCount(bank.getAtmsCount() + 1);
+
+        return bank.getAtmsCount();
     }
 
     /**
      * Удаление банкомата.
      */
-    public void removeAtm() {
-        this.bank.atmsCount--;
+    public int removeAtm(int id) {
+        var bank = getBankIfExists(id);
+        bank.setAtmsCount(bank.getAtmsCount() - 1);
+
+        return bank.getAtmsCount();
+    }
+
+    /**
+     * Получение списка всех банков
+     * @return Список всех банков
+     */
+    public List<Bank> getAllBanks() {
+        return bankRepository.findAll();
+    }
+
+    /**
+     * Получение банка по идентификатору, если он существует
+     * @param id Идентификатор банка
+     * @return Банк, если найден, иначе выбрасывается исключение
+     * @throws NoSuchElementException если банк не найден
+     */
+    public Bank getBankIfExists(int id) throws NoSuchElementException {
+        return getBankById(id);
+    }
+
+    /**
+     * Увеличение числа сотрудников банка
+     * @param id Идентификатор банка
+     * @return Обновленное количество сотрудников банка
+     */
+    public int addEmployee(int id) {
+        var bank = getBankIfExists(id);
+        bank.setEmployeesCount(bank.getEmployeesCount() + 1);
+        return bank.getEmployeesCount();
+    }
+
+    /**
+     * Увеличение числа клиентов банка
+     * @param id Идентификатор банка
+     * @return Обновленное количество клиентов банка
+     */
+    public int addClient(int id) {
+        var bank = getBankIfExists(id);
+        bank.setClientsCount(bank.getClientsCount() + 1);
+        return bank.getClientsCount();
+    }
+
+    /**
+     * Уменьшение числа офисов банка
+     * @param id Идентификатор банка
+     * @return Обновленное количество офисов банка
+     */
+    public int removeOffice(int id) {
+        var bank = getBankIfExists(id);
+        bank.setOfficesCount(bank.getOfficesCount() - 1);
+        return bank.getOfficesCount();
+    }
+
+    /**
+     * Уменьшение числа сотрудников банка
+     * @param id Идентификатор банка
+     * @return Обновленное количество сотрудников банка
+     */
+    public int removeEmployee(int id) {
+        var bank = getBankIfExists(id);
+        bank.setEmployeesCount(bank.getEmployeesCount() - 1);
+        return bank.getEmployeesCount();
+    }
+
+    /**
+     * Уменьшение числа клиентов банка
+     * @param id Идентификатор банка
+     * @return Обновленное количество клиентов банка
+     */
+    public int removeClient(int id) {
+        var bank = getBankIfExists(id);
+        bank.setClientsCount(bank.getClientsCount() - 1);
+        return bank.getClientsCount();
     }
 }

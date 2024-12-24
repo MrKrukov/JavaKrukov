@@ -1,14 +1,21 @@
 package tech.reliab.course.krukov.bank.entity;
 
 import java.time.LocalDate;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+@Entity
 public class User extends Person {
     protected String workplace;
     protected double monthlyIncome;
     protected int bankCount;
-    protected int creditAccountCount;
-    protected int paymentAccountCount;
     protected int creditRating;
+    @ManyToOne
+    private Bank bank;
 
     /**
      * Конструктор класса User
@@ -18,32 +25,13 @@ public class User extends Person {
      * @param workplace Место работы клиента
      */
     public User(int id, String fullName, LocalDate birthDate, String workplace) {
-        super(id, fullName, birthDate);
+        super(fullName, birthDate);
         this.workplace = workplace;
         this.monthlyIncome = Math.random() * 10000;
-        this.bankCount = 0;
-        this.creditAccountCount = 0;
-        this.paymentAccountCount = 0;
     }
 
-    /**
-     * Получение Id.
-     * @return Идентификатор
-     */
-    public int getId() { return this.id; }
-
-    /**
-     * Получение ежемесячного дохода.
-     * @return ежемесячный доход
-     */
-    public double getMonthlyIncome() { return this.monthlyIncome; }
-
-    /**
-     * Получение ежемесячного дохода.
-     * @return ФИО
-     */
-    public void setCreditRating(int creditRating) {
-        this.creditRating = creditRating;
+    public User() {
+        super();
     }
 
     /**
@@ -58,8 +46,6 @@ public class User extends Person {
                 "Место работы: " + this.workplace + "\n" +
                 "Ежемесячный доход: " + String.format("%.2f", this.monthlyIncome) + "\n" +
                 "Кредитный рейтинг для банка: " + this.creditRating + "\n" +
-                "Банки, которыми он пользуется: " + this.bankCount + "\n" +
-                "Кредитные счета: " + this.creditAccountCount + "\n" +
-                "Платежные счета: " + this.paymentAccountCount;
+                "Банки, которыми он пользуется: " + this.bankCount + "\n";
     }
 }

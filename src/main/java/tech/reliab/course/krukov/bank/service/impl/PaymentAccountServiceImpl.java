@@ -1,17 +1,28 @@
 package tech.reliab.course.krukov.bank.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import tech.reliab.course.krukov.bank.entity.Bank;
 import tech.reliab.course.krukov.bank.entity.PaymentAccount;
+import tech.reliab.course.krukov.bank.entity.User;
+import tech.reliab.course.krukov.bank.repository.PaymentAccountRepository;
 import tech.reliab.course.krukov.bank.service.PaymentAccountService;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@Service
 public class PaymentAccountServiceImpl implements PaymentAccountService {
-    private PaymentAccount paymentAccount;
+    @Autowired
+    private PaymentAccountRepository paymentAccountRepository;
 
     /**
      * Создание нового платежного счета.
      */
     @Override
-    public void create(PaymentAccount newPaymentAccount) {
-        this.paymentAccount = newPaymentAccount;
+    public PaymentAccount createPaymentAccount(User user, Bank bank) {
+        PaymentAccount paymentAccount = new PaymentAccount(user, bank);
+
+        return paymentAccountRepository.save(paymentAccount);
     }
 
     /**
@@ -19,22 +30,19 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
      * @param id Идентификатор платежного счета
      */
     @Override
-    public PaymentAccount read(int id) {
-        if (this.paymentAccount != null && this.paymentAccount.getId() == id) {
-            return paymentAccount;
-        } else {
-            return null;
-        }
+    public Optional<PaymentAccount> getPaymentAccountById(int id) {
+        return paymentAccountRepository.findAll().stream()
+                .filter(paymentAccount -> paymentAccount.getId() == id)
+                .findFirst();
     }
 
     /**
      * Обновление данных платежного счета.
      */
     @Override
-    public void update(PaymentAccount paymentAccount) {
-        if (this.paymentAccount != null && this.paymentAccount.getId() == paymentAccount.getId()) {
-            this.paymentAccount = paymentAccount;
-        }
+    public void updatePaymentAccount(int id, Bank bank) {
+        PaymentAccount paymentAccount = getPaymentAccountIfExists(id);
+        paymentAccount.setBank(bank);
     }
 
     /**
@@ -42,9 +50,37 @@ public class PaymentAccountServiceImpl implements PaymentAccountService {
      * @param id Идентификатор платежного счета
      */
     @Override
-    public void delete(int id) {
-        if (this.paymentAccount != null && this.paymentAccount.getId() == id) {
-            this.paymentAccount = null;
-        }
+    public void deletePaymentAccount(int id) {
+        PaymentAccount paymentAccount = getPaymentAccountIfExists(id);
+        paymentAccountRepository.delete(paymentAccount);
+    }
+
+    /**
+     * Получение списка всех платежных аккаунтов
+     * @return Список всех платежных аккаунтов
+     */
+    public List<PaymentAccount> getAllPaymentAccounts() {
+        return paymentAccountRepository.findAll();
+    }
+
+    /**
+     * Получение всех платежных аккаунтов по идентификатору пользователя
+     * @param userId Идентификатор пользователя
+     * @return Список платежных аккаунтов пользователя
+     */
+    @Override
+    public List<PaymentAccount> getAllPaymentAccountsByUserId(int userId) {
+        return paymentAccountRepository.findAll().stream()
+                .filter(account -> account.getUser().getId() == userId)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Получение платежного аккаунта по идентификатору, если он существует
+     * @param id Идентификатор платежного аккаунта
+     * @return Платежный аккаунт, если найден, иначе выбрасывается исключение
+     */
+    private PaymentAccount getPaymentAccountIfExists(int id) {
+        return getPaymentAccountById(id).orElseThrow(() -> new NoSuchElementException("PaymentAccount was not found"));
     }
 }

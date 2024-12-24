@@ -1,17 +1,32 @@
 package tech.reliab.course.krukov.bank.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import tech.reliab.course.krukov.bank.entity.Bank;
 import tech.reliab.course.krukov.bank.entity.BankOffice;
+import tech.reliab.course.krukov.bank.enums.BankStatus;
+import tech.reliab.course.krukov.bank.repository.BankOfficeRepository;
 import tech.reliab.course.krukov.bank.service.BankOfficeService;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@Service
 public class BankOfficeServiceImpl implements BankOfficeService {
-    private BankOffice office;
+    @Autowired
+    private BankOfficeRepository bankOfficeRepository;
 
     /**
      * Создание нового офиса.
      */
     @Override
-    public void create(BankOffice newOffice) {
-        this.office = newOffice;
+    public BankOffice createBankOffice(String name, String address, boolean canPlaceAtm,
+                                       boolean canIssueLoan, boolean cashWithdrawal, boolean cashDeposit,
+                                       double rentCost, Bank bank) {
+        BankOffice bankOffice = new BankOffice(name, address, bank, rentCost);
+        bankOffice.setStatus(generateStatus());
+        bankOffice.setBalance(generateOfficeMoney(bank));
+
+        return bankOfficeRepository.save(bankOffice);
     }
 
     /**
@@ -19,32 +34,39 @@ public class BankOfficeServiceImpl implements BankOfficeService {
      * @param id Идентификатор офиса
      */
     @Override
-    public BankOffice read(int id) {
-        if (this.office != null && this.office.getId() == id) {
-            return office;
-        } else {
-            return null;
-        }
+    public BankOffice getBankOfficeById(long id) {
+        return bankOfficeRepository.findById(id).orElse(null);
     }
 
     /**
-     * Обновление данных офиса.
+     * Генерация случайного статуса банка
+     * @return Случайный статус банка
      */
-    @Override
-    public void update(BankOffice newOffice) {
-        if (this.office != null && this.office.getId() == newOffice.getId()) {
-            this.office = newOffice;
-        }
+    private BankStatus generateStatus() {
+        return BankStatus.getRandomStatus();
     }
 
     /**
-     * Удаление офиса.
-     * @param id Идентификатор офиса
+     * Получение списка всех офисов банка
+     * @return Список всех офисов банка
      */
+    public List<BankOffice> getAllBankOffices() {
+        return bankOfficeRepository.findAll();
+    }
+
     @Override
-    public void delete(int id) {
-        if (this.office != null && this.office.getId() == id) {
-            this.office = null;
-        }
+    public List<BankOffice> getAllBankOfficesByBank(Bank bank) {
+        return bankOfficeRepository.findAll().stream()
+                .filter(bankOffice -> bankOffice.getBankId() == bank.getId())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Генерация случайной суммы средств для офиса банка
+     * @param bank Банк, которому принадлежит офис
+     * @return Случайная сумма средств, не превышающая общую сумму средств банка
+     */
+    private double generateOfficeMoney(Bank bank) {
+        return new Random().nextDouble(bank.getTotalMoney());
     }
 }

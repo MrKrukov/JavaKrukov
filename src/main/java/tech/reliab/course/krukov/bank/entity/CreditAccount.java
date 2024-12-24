@@ -1,9 +1,18 @@
 package tech.reliab.course.krukov.bank.entity;
 
 import java.time.LocalDate;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
+@Entity
 public class CreditAccount {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+    @ManyToOne
     private User user;
     private String bankName;
     private LocalDate startDate;
@@ -12,45 +21,36 @@ public class CreditAccount {
     private double loanAmount;
     private double monthlyPayment;
     private double interestRate;
+    @ManyToOne
     private Employee employee;
+    @ManyToOne
     private PaymentAccount paymentAccount;
+    @ManyToOne
     private Bank bank;
 
     /**
      * Конструктор класса CreditAccount
-     * @param id ID аккаунта
      * @param user Пользователь, за которым закреплен этот кредитный счет
      * @param startDate Дата начала кредита
-     * @param endDate Дата окончания кредита
      * @param loanTermInMonths Кол-во месяцев, на которые взят кредит
-     * @param loanAmount Сумма кредита
-     * @param monthlyPayment Ежемесячный платеж
      * @param interestRate Процентная ставка
      * @param employee Сотрудник, который выдал кредит
      * @param paymentAccount Платежный счет в банке с которого будет осуществляться погашение данного кредита
      */
-    public CreditAccount(int id, User user, Bank bank, LocalDate startDate, LocalDate endDate,
-                         int loanTermInMonths, double loanAmount, double monthlyPayment, double interestRate,
+    public CreditAccount(User user, Bank bank, LocalDate startDate,
+                         int loanTermInMonths, double interestRate,
                          Employee employee, PaymentAccount paymentAccount) {
-        this.id = id;
         this.user = user;
         this.bankName = bank.getName();
         this.startDate = startDate;
-        this.endDate = endDate;
         this.loanTermInMonths = loanTermInMonths;
-        this.loanAmount = loanAmount;
-        this.monthlyPayment = monthlyPayment;
         this.interestRate = bank.getInterestRate();
         this.employee = employee;
         this.paymentAccount = paymentAccount;
         this.bank = bank;
     }
 
-    /**
-     * Получение Id.
-     * @return Идентификатор
-     */
-    public int getId() { return this.id; }
+    public CreditAccount() { }
 
     /**
      * Переопределение метода toString() для аккаунта.

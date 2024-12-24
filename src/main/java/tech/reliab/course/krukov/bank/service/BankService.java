@@ -2,10 +2,32 @@ package tech.reliab.course.krukov.bank.service;
 
 import tech.reliab.course.krukov.bank.entity.Bank;
 
-public interface BankService extends CrudOperations<Bank> {
-    void addOffice();
+import java.util.List;
 
-    void addAtm();
+public interface BankService {
+    void registerBank(Bank bank);
 
-    void removeAtm();
+    Bank getBankById(long id);
+
+    List<Bank> getAllBanks();
+
+    void deleteBank(long id);
+
+    int addOffice(int id);
+
+    int addAtm(int id);
+
+    int addEmployee(int id);
+
+    int addClient(int id);
+
+    int removeOffice(int id);
+
+    int removeAtm(int id);
+
+    int removeEmployee(int id);
+
+    int removeClient(int id);
+
+    Bank getBankIfExists(int id);
 }
